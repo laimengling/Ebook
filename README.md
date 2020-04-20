@@ -38,9 +38,60 @@ See [Configuration Reference](https://cli.vuejs.org/config/).
 ```
     import './assets/fonts/daysOne.css'
 ```
-
+### rem 设置
+1. rem的初始考虑
+    - 在js中判定跟像素的字体大小
+    - 在css中计算具体的rem
+```
+   document.addEventListener('DOMContentLoaded', () => {
+     const html = document.querySelector('html')
+     let fontSize = window.innerWidth / 10
+     fontSize = fontSize > 50 ? 50 : fontSize
+     html.style.fontSize = fontSize + 'px'
+   })
+```
+> 在实际开发中，需要计算，麻烦
+2. rem直接写入px像素，根据px像素转换为rem
+    - 在global中添加方法
+    - 需要使用的地方添加引入global.scss文件即可
+    - 方法：
+```
+$ratio: 375 / 10;
+@function px2rem($px) {
+  @return $px / $ratio + rem;
+}
+```
+### vuex的引入
+1. 在vue/cli 4 与vue/cli 3的vuex与router的不同：默认目录结构已更改
+    `src/store.js`改为 `src/store/index.js`
+    `src/router.js`改为 `src/router/index.js`
+2. vuex应用的核心就是 store（仓库）。“store”基本上就是一个容器，它包含着你的应用中大部分的状态 (state)。属性：
+    - state:不可直接改变state的属性，唯一修改状态的途径是mutation
+    - mutation
+        - 每个 mutation 都有一个字符串的 事件类型 (type) 和 一个 回调函数 (handler)。这个回调函数就是我们实际进行状态更改的地方，并且它会接受 state 作为第一个参数
+        - 调用mutation的函数 `store.commit('函数名')`
+        -  **必须同步执行**
+    - actions：类似于mutation，不同：
+        - Action 提交的是 mutation，而不是直接变更状态。
+        - Action 可以包含**任意异步操作**。
+        - 分发action等好看官方网站[vuex](https://vuex.vuejs.org/zh/guide/actions.html)
+    - modules
+        - 模块化：在使用store的时候，如果含有大量的数据，将变得臃肿，因此切割为模块
+        - 使用： `this.$route.state.book.test`十分繁琐
+            - 改进,使用`mapGetters`
+                - 创建getter.js文件，将数据暴露出来 ` test: state => state.book.test`
+                - 在需要使用的地方引入： `import { mapGetters } from 'vuex'`
+                - 在js中使用
+                `computed: {...mapGetters(['test'])},`
+                - 使用的时候，直接使用 `this.test`
+    - 模块化时， `...mapGetters['test']`
+                 
 ## 项目开发踩坑
 ### vue.config.js配置
 1. vue的路径问题
     - @vue/cli 3.3版本之前： `baseUrl`
     - @vue/cli 3.3版本之后： `publicPath`
+### es-lint使用
+1. 出现错误 `Newline required at end of file but not found  eol-last`
+    解决：在最后一行后面加回车
+2. 

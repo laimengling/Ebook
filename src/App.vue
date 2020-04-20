@@ -5,7 +5,18 @@
     </div>
 </template>
 <script>
-export default {}
+import { mapGetters } from 'vuex'
+
+export default {
+  computed: {
+    ...mapGetters(['test'])
+  },
+  mounted () {
+    this.$store.dispatch('setTest', 1).then(() => {
+      console.log(this.test)
+    })
+  }
+}
 // rem设置，自适应布局实现,设置字体最大1rem=50px
 document.addEventListener('DOMContentLoaded', () => {
   const html = document.querySelector('html')
@@ -16,6 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
 </script>
 <style scoped lang="scss">
     @import "./assets/styles/global.scss";
+
     .text {
         font-family: 'Days One';
         font-size: px2rem(20);
