@@ -97,3 +97,4 @@ $ratio: 375 / 10;
 ### epubjs使用
 1. 在开发时“touchstart”，“touchend”无法被触发的情况
     解决：更新epubjs到指定版本 `cnpm update epubjs@0.3.71 -S`
+    最终解决：上方百度结果对项目在谷歌运行未起作用，因此在渲染页面加上mask，分区点击实现翻页效果
