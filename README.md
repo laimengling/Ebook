@@ -94,4 +94,6 @@ $ratio: 375 / 10;
 ### es-lint使用
 1. 出现错误 `Newline required at end of file but not found  eol-last`
     解决：在最后一行后面加回车
-2. 
+### epubjs使用
+1. 在开发时“touchstart”，“touchend”无法被触发的情况
+    解决：更新epubjs到指定版本 `cnpm update epubjs@0.3.71 -S`
