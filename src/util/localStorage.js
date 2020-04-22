@@ -27,6 +27,7 @@ export function saveHome (home) {
   return setLocalStorage('home', home, 1800)
 }
 
+// 设置与获取语言，实现i18n的国际化
 export function getLocale () {
   return getLocalStorage('locale')
 }
