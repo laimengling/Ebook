@@ -12,6 +12,12 @@
 <script>
 import { ebookMixin } from '../../util/mixin'
 import Epub from 'epubjs'
+import {
+  getFontFamily,
+  getFontSize,
+  saveFontFamily,
+  saveFontSize
+} from '../../util/localStorage'
 global.ePub = Epub
 export default {
   mixins: [ebookMixin],
@@ -42,6 +48,26 @@ export default {
       this.setSettingVisible(-1)
       this.setFontFamilyVisible(false)
     },
+    initFontSize () {
+      // 字体大小缓存与展示
+      const fontSize = getFontSize(this.fileName)
+      if (!fontSize) {
+        saveFontSize(this.fileName, this.defaultFontSize)
+      } else {
+        this.rendition.themes.font(fontSize)
+        this.setDefaultFontSize(fontSize)
+      }
+    },
+    initFontFamily () {
+      // book渲染后，将默认设置存入缓存,如果缓存中存在设置，就渲染出来,同时该书在vuex的保存的状态也需同步更新
+      const font = getFontFamily(this.fileName)
+      if (!font) {
+        saveFontFamily(this.fileName, this.defaultFontFamily)
+      } else {
+        this.rendition.themes.font(font)
+        this.setDefaultFontFamily(font)
+      }
+    },
     initEpub () { // 电子书的解析和渲染
       const url = 'http://localhost:9091/epub/' + this.fileName + '.epub'
       this.book = new Epub(url)
@@ -51,7 +77,10 @@ export default {
         height: innerHeight,
         method: 'default'
       })
-      this.rendition.display()
+      this.rendition.display().then(() => {
+        this.initFontSize()
+        this.initFontFamily()
+      })
       /* 本段代码废弃，原因：在浏览器当中不知为何，H5的touchstart与touchend不被触发
       this.rendition.on('touchstart', event => {
         this.touchStartX = event.changedTouches[0].clientX
