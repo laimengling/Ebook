@@ -30,15 +30,22 @@ export default {
     },
     toggleTitleAndMenu () {
       // this.$store.dispatch('setMenuVisible', !this.menuVisible)
+      if (this.menuVisible) { // 当前的状态为true，需要toggle为false，设置面板需要隐藏
+        this.setSettingVisible(-1)
+        this.setFontFamilyVisible(false)
+      }
       this.setMenuVisible(!this.menuVisible)
     },
     hideTitleAndMenu () {
       // this.$store.dispatch('setMenuVisible', false)
       this.setMenuVisible(false)
+      this.setSettingVisible(-1)
+      this.setFontFamilyVisible(false)
     },
     initEpub () { // 电子书的解析和渲染
       const url = 'http://localhost:9091/epub/' + this.fileName + '.epub'
       this.book = new Epub(url)
+      this.setCurrentBook(this.book)
       this.rendition = this.book.renderTo('read', {
         width: innerWidth,
         height: innerHeight,
@@ -63,6 +70,14 @@ export default {
         event.preventDefault()
         event.stopPropagation() // 禁止传播
       }) */
+      this.rendition.hooks.content.register(contents => {
+        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/daysOne.css`)
+        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/Cabin.css`)
+        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/Montserrat.css`)
+        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/Tangerine.css`)
+        // addStylesheet 参数必须是路径，为了在开发后，环境变量统一加载到用户中，添加.env.development
+        // 使用过程中注意需要重新关闭服务器
+      })
     }
   },
   mounted () {

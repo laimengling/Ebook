@@ -9,6 +9,7 @@
 }
 .slide-up-enter, .slide-up-leave-to {
   transform: translate3d(0, px2rem(138), 0)
+  /* 移动的原因： 向下移动的距离设置为menu与settingFont的宽度之和，使得位移相同，移动同步*/
 }
 .fade-enter, .fade-leave-to {
   opacity: 0;
