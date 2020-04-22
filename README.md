@@ -86,6 +86,23 @@ $ratio: 375 / 10;
                 - 使用的时候，直接使用 `this.test`
     - 模块化时， `...mapGetters['test']`
                  
+### epubjs
+1. epubjsuanran出来的书籍页面，是显示在iframe当中
+    - 我们无法在外部页面引入css文件，而iframe内的样式变化
+        - 因此在初始化渲染页面的地方，加载所需要的css文件
+        - 在需要修改字体类型的地方修改名称
+        `this.currentBook.rendition.themes.font(字体类型)`
+```
+    this.rendition.hooks.content.register(contents => {
+            contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/daysOne.css`)
+            contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/Cabin.css`)
+            contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/Montserrat.css`)
+            contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/Tangerine.css`)
+            // addStylesheet 参数必须是路径，为了在开发后，环境变量统一加载到用户中，添加.env.development
+            // 使用过程中注意需要重新关闭服务器
+          })
+```  
+
 ## 项目开发踩坑
 ### vue.config.js配置
 1. vue的路径问题
