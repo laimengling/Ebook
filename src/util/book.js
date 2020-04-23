@@ -70,3 +70,21 @@ export function addCss (href) {
   link.setAttribute('href', href)
   document.getElementsByTagName('head')[0].appendChild(link)
 }
+
+export function removeCss (href) {
+  const links = document.getElementsByTagName('link')
+  for (var i = links.length - 1; i >= 0; i--) {
+    const link = links[i]
+    const linkHref = link.getAttribute('href')
+    if (link && linkHref && linkHref === href) {
+      link.parentNode.removeChild(link)
+    }
+  }
+}
+
+export function removeAllCss () {
+  removeCss(`${process.env.VUE_APP_RES_URL}/theme/theme_default.css`)
+  removeCss(`${process.env.VUE_APP_RES_URL}/theme/theme_eye.css`)
+  removeCss(`${process.env.VUE_APP_RES_URL}/theme/theme_gold.css`)
+  removeCss(`${process.env.VUE_APP_RES_URL}/theme/theme_night.css`)
+}

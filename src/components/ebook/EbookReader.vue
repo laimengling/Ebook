@@ -96,8 +96,8 @@ export default {
         this.initFontSize()
         this.initFontFamily()
         this.initTheme()
-        this.initGlobalStyle()
       })
+      this.initGlobalStyle()
       // 获取themes对象，便于改变主题颜色
       this.themes = this.rendition.themes
 
