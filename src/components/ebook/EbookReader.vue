@@ -15,8 +15,10 @@ import Epub from 'epubjs'
 import {
   getFontFamily,
   getFontSize,
+  getTheme,
   saveFontFamily,
-  saveFontSize
+  saveFontSize,
+  saveTheme
 } from '../../util/localStorage'
 global.ePub = Epub
 export default {
@@ -68,8 +70,21 @@ export default {
         this.setDefaultFontFamily(font)
       }
     },
+    initTheme () {
+      // 注册主题类型
+      let defaultTheme = getTheme(this.fileName)
+      if (!defaultTheme) {
+        defaultTheme = this.themeList[0].name
+        saveTheme(this.fileName, defaultTheme)
+      }
+      this.setDefaultTheme(defaultTheme)
+      this.themeList.forEach(theme => {
+        this.themes.register(theme.name, theme.style)
+      })
+      this.themes.select(defaultTheme)
+    },
     initEpub () { // 电子书的解析和渲染
-      const url = 'http://localhost:9091/epub/' + this.fileName + '.epub'
+      const url = `${process.env.VUE_APP_RES_URL}/epub/` + this.fileName + '.epub'
       this.book = new Epub(url)
       this.setCurrentBook(this.book)
       this.rendition = this.book.renderTo('read', {
@@ -80,7 +95,12 @@ export default {
       this.rendition.display().then(() => {
         this.initFontSize()
         this.initFontFamily()
+        this.initTheme()
+        this.initGlobalStyle()
       })
+      // 获取themes对象，便于改变主题颜色
+      this.themes = this.rendition.themes
+
       /* 本段代码废弃，原因：在浏览器当中不知为何，H5的touchstart与touchend不被触发
       this.rendition.on('touchstart', event => {
         this.touchStartX = event.changedTouches[0].clientX

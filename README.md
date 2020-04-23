@@ -102,7 +102,8 @@ $ratio: 375 / 10;
             // 使用过程中注意需要重新关闭服务器
           })
 ```  
-
+2. 主题设置功能实现
+    - 实现原理： `this.thems.register(name, styles)`  `this.themes.select(name)`
 ## 项目开发踩坑
 ### vue.config.js配置
 1. vue的路径问题
