@@ -104,6 +104,16 @@ $ratio: 375 / 10;
 ```  
 2. 主题设置功能实现
     - 实现原理： `this.thems.register(name, styles)`  `this.themes.select(name)`
+3. 阅读进度功能实现
+    - 实现的对象： `this.book.locations`消耗性能，默认不生成
+    - 改进方法：epubjs的钩子函数 
+```
+    this.book.ready.then(() = >{
+        return this.book.locations.generate()
+    }).then(result => {
+        this.locations = this.book.locations
+    })
+```
 ## 项目开发踩坑
 ### vue.config.js配置
 1. vue的路径问题

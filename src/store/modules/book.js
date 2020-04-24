@@ -6,13 +6,13 @@ const book = {
     defaultFontSize: 16, // 默认字体大小
     defaultFontFamily: 'Default', // 默认字体类型
     fontFamilyVisible: false, // 默认字体板块是否可见
-    defaultTheme: 'Default',
-    bookAvailable: false,
-    progress: 0,
-    section: 0,
+    defaultTheme: 'Default', // 默认主题
+    bookAvailable: false, // 书籍是否加载完成
+    progress: 0, // 阅读书籍进度条
+    section: 0, // 阅读书籍章节
     isPaginating: true,
-    currentBook: null,
-    navigation: null,
+    currentBook: null, // 当前书籍
+    navigation: null, // 目录对象
     cover: null,
     metadata: null,
     paginate: '',

@@ -15,6 +15,7 @@ import Epub from 'epubjs'
 import {
   getFontFamily,
   getFontSize,
+  getLocation,
   getTheme,
   saveFontFamily,
   saveFontSize,
@@ -26,13 +27,17 @@ export default {
   methods: {
     prevPage () { // 上一页
       if (this.rendition) {
-        this.rendition.prev()
+        this.rendition.prev().then(() => {
+          this.refreshLocation()
+        })
         this.hideTitleAndMenu()
       }
     },
     nextPage () { // 下一页
       if (this.rendition) {
-        this.rendition.next()
+        this.rendition.next().then(() => {
+          this.refreshLocation()
+        })
         this.hideTitleAndMenu()
       }
     },
@@ -83,24 +88,46 @@ export default {
       })
       this.themes.select(defaultTheme)
     },
-    initEpub () { // 电子书的解析和渲染
-      const url = `${process.env.VUE_APP_RES_URL}/epub/` + this.fileName + '.epub'
-      this.book = new Epub(url)
-      this.setCurrentBook(this.book)
+    initRendition () { // 初始化渲染的过程函数
       this.rendition = this.book.renderTo('read', {
         width: innerWidth,
         height: innerHeight,
         method: 'default'
       })
-      this.rendition.display().then(() => {
+      // 判定是否已读，已读跳转章节，并刷新使得进度条等一致
+      const location = getLocation(this.fileName)
+      console.log(location)
+      this.display(location, () => {
         this.initFontSize()
         this.initFontFamily()
         this.initTheme()
+        this.initGlobalStyle()
       })
-      this.initGlobalStyle()
+      // 加载css文件
+      this.rendition.hooks.content.register(contents => {
+        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/daysOne.css`)
+        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/Cabin.css`)
+        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/Montserrat.css`)
+        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/Tangerine.css`)
+        // addStylesheet 参数必须是路径，为了在开发后，环境变量统一加载到用户中，添加.env.development
+        // 使用过程中注意需要重新关闭服务器
+      })
+    },
+    initEpub () { // 电子书的解析和渲染
+      const url = `${process.env.VUE_APP_RES_URL}/epub/` + this.fileName + '.epub'
+      this.book = new Epub(url)
+      this.setCurrentBook(this.book)
+      this.initRendition()
       // 获取themes对象，便于改变主题颜色
       this.themes = this.rendition.themes
-
+      // location直接生成内存消耗大，使用book的钩子函数
+      this.book.ready.then(() => {
+        // 标准宽度为375像素 字体大小为16像素 预计分为750页，根据实际情况进行分页
+        return this.book.locations.generate(750 * (window.innerWidth / 375) * (getFontSize(this.fileName) / 16))
+      }).then(locations => {
+        this.setBookAvailable(true)
+        this.refreshLocation()
+      })
       /* 本段代码废弃，原因：在浏览器当中不知为何，H5的touchstart与touchend不被触发
       this.rendition.on('touchstart', event => {
         this.touchStartX = event.changedTouches[0].clientX
@@ -119,14 +146,6 @@ export default {
         event.preventDefault()
         event.stopPropagation() // 禁止传播
       }) */
-      this.rendition.hooks.content.register(contents => {
-        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/daysOne.css`)
-        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/Cabin.css`)
-        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/Montserrat.css`)
-        contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/Tangerine.css`)
-        // addStylesheet 参数必须是路径，为了在开发后，环境变量统一加载到用户中，添加.env.development
-        // 使用过程中注意需要重新关闭服务器
-      })
     }
   },
   mounted () {
