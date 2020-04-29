@@ -21,26 +21,28 @@ import {
   saveFontSize,
   saveTheme
 } from '../../util/localStorage'
+import { flatten } from '../../util/book'
+
 global.ePub = Epub
 export default {
   mixins: [ebookMixin],
   methods: {
-    prevPage () { // 上一页
+    prevPage () {
       if (this.rendition) {
         this.rendition.prev().then(() => {
           this.refreshLocation()
         })
         this.hideTitleAndMenu()
       }
-    },
-    nextPage () { // 下一页
+    }, // 上一页
+    nextPage () {
       if (this.rendition) {
         this.rendition.next().then(() => {
           this.refreshLocation()
         })
         this.hideTitleAndMenu()
       }
-    },
+    }, // 下一页
     toggleTitleAndMenu () {
       // this.$store.dispatch('setMenuVisible', !this.menuVisible)
       if (this.menuVisible) { // 当前的状态为true，需要toggle为false，设置面板需要隐藏
@@ -48,12 +50,6 @@ export default {
         this.setFontFamilyVisible(false)
       }
       this.setMenuVisible(!this.menuVisible)
-    },
-    hideTitleAndMenu () {
-      // this.$store.dispatch('setMenuVisible', false)
-      this.setMenuVisible(false)
-      this.setSettingVisible(-1)
-      this.setFontFamilyVisible(false)
     },
     initFontSize () {
       // 字体大小缓存与展示
@@ -88,7 +84,7 @@ export default {
       })
       this.themes.select(defaultTheme)
     },
-    initRendition () { // 初始化渲染的过程函数
+    initRendition () {
       this.rendition = this.book.renderTo('read', {
         width: innerWidth,
         height: innerHeight,
@@ -112,12 +108,13 @@ export default {
         // addStylesheet 参数必须是路径，为了在开发后，环境变量统一加载到用户中，添加.env.development
         // 使用过程中注意需要重新关闭服务器
       })
-    },
-    initEpub () { // 电子书的解析和渲染
+    }, // 初始化渲染的过程函数
+    initEpub () {
       const url = `${process.env.VUE_APP_RES_URL}/epub/` + this.fileName + '.epub'
       this.book = new Epub(url)
       this.setCurrentBook(this.book)
       this.initRendition()
+      this.parseBook()
       // 获取themes对象，便于改变主题颜色
       this.themes = this.rendition.themes
       // location直接生成内存消耗大，使用book的钩子函数
@@ -146,7 +143,29 @@ export default {
         event.preventDefault()
         event.stopPropagation() // 禁止传播
       }) */
-    }
+    }, // 电子书的解析和渲染
+    parseBook () {
+      this.book.loaded.cover.then(cover => {
+        this.book.archive.createUrl(cover).then(url => {
+          this.setCover(url) // 返回blob 资源类型
+        })
+      })
+      this.book.loaded.metadata.then(metadata => {
+        this.setMetadata(metadata)
+      })
+      this.book.loaded.navigation.then(nav => {
+        const navItem = flatten(nav.toc)
+        function find (item, level = 0) {
+          return !item.parent ? level : find(
+            navItem.filter(parentItem => parentItem.id === item.parent)[0],
+            ++level)
+        }
+        navItem.forEach(item => {
+          item.level = find(item)
+        })
+        this.setNavigation(navItem)
+      })
+    } // 解析电子书的基本信息，方便目录中查找下方信息的修改
   },
   mounted () {
     const fileName = this.$route.params.fileName.split('|').join('/')

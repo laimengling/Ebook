@@ -13,8 +13,8 @@ const book = {
     isPaginating: true,
     currentBook: null, // 当前书籍
     navigation: null, // 目录对象
-    cover: null,
-    metadata: null,
+    cover: null, // 书籍封面
+    metadata: null, // 书籍的基本信息
     paginate: '',
     pagelist: null,
     offsetY: 0,

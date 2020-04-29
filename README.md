@@ -87,7 +87,7 @@ $ratio: 375 / 10;
     - 模块化时， `...mapGetters['test']`
                  
 ### epubjs
-1. epubjsuanran出来的书籍页面，是显示在iframe当中
+1. epubjs出来的书籍页面，是显示在iframe当中
     - 我们无法在外部页面引入css文件，而iframe内的样式变化
         - 因此在初始化渲染页面的地方，加载所需要的css文件
         - 在需要修改字体类型的地方修改名称
@@ -98,7 +98,8 @@ $ratio: 375 / 10;
             contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/Cabin.css`)
             contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/Montserrat.css`)
             contents.addStylesheet(`${process.env.VUE_APP_RES_URL}/fonts/Tangerine.css`)
-            // addStylesheet 参数必须是路径，为了在开发后，环境变量统一加载到用户中，添加.env.development
+            // addStylesheet 参数必须是路径，为了在开发后，
+环境变量统一加载到用户中，添加.env.development
             // 使用过程中注意需要重新关闭服务器
           })
 ```  
@@ -114,6 +115,22 @@ $ratio: 375 / 10;
         this.locations = this.book.locations
     })
 ```
+### 动画小技巧
+1. components/EbookSlide.vue 过渡动画
+    - 原本可以设置为 `fade-slide-right`
+    - 改进：将过渡变为2个动画，交互流畅不突兀，提高页面显示效果
+### css小技巧
+1. 多行展示数据，并且有... (需要设定宽度)
+```
+@mixin ellipsis2($line){
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp:$line;
+  white-space: normal;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  word-break: break-all;
+}
+```
 ## 项目开发踩坑
 ### vue.config.js配置
 1. vue的路径问题
@@ -126,3 +143,18 @@ $ratio: 375 / 10;
 1. 在开发时“touchstart”，“touchend”无法被触发的情况
     解决：更新epubjs到指定版本 `cnpm update epubjs@0.3.71 -S`
     最终解决：上方百度结果对项目在谷歌运行未起作用，因此在渲染页面加上mask，分区点击实现翻页效果
+## 项目难点
+1. 将多级目录转为一级目录
+```
+function flatten (array) {
+  return [].concat(...array.map(item => [].concat(item, ...flatten(item.subitems))))
+}
+```
+2. 转为一级目录之后，如何知道为第几级元素
+```
+function find (item, level = 0) {
+          return !item.parent ? level : find(
+            navItem.filter(parentItem => parentItem.id === item.parent)[0],
+            ++level)
+        }
+```

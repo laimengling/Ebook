@@ -38,7 +38,6 @@
 <script>
 import { ebookMixin } from '../../util/mixin'
 import {
-  getReadTime,
   saveProgress
 } from '../../util/localStorage'
 
@@ -46,14 +45,15 @@ export default {
   mixins: [ebookMixin],
   computed: {
     getSectionName () {
+      /* 多级目录不适用
       if (this.section) {
         const sectionInfo = this.currentBook.section(this.section)
         if (sectionInfo && sectionInfo.href && this.currentBook && this.currentBook.navigation) {
           return this.currentBook.navigation.get(sectionInfo.href).label
           // return this.navigation[this.section].label
         }
-      }
-      return '1'
+      } */
+      return this.section ? this.navigation[this.section].label : ''
     }
   },
   methods: {
@@ -107,18 +107,7 @@ export default {
         this.display(sectionInfo.href)
         this.refreshLocation()
       }
-    }, // 展示章节内容
-    getReadTimeText () {
-      return this.$t('book.haveRead').replace('$1', this.getReadTimeByMinute())
-    },
-    getReadTimeByMinute () {
-      const readTime = getReadTime(this.fileName)
-      if (!readTime) {
-        return 0
-      } else {
-        return Math.ceil(readTime / 60)
-      }
-    }
+    } // 展示章节内容
   },
   updated () {
     this.updateProgressBg()
