@@ -43,19 +43,6 @@ import {
 
 export default {
   mixins: [ebookMixin],
-  computed: {
-    getSectionName () {
-      /* 多级目录不适用
-      if (this.section) {
-        const sectionInfo = this.currentBook.section(this.section)
-        if (sectionInfo && sectionInfo.href && this.currentBook && this.currentBook.navigation) {
-          return this.currentBook.navigation.get(sectionInfo.href).label
-          // return this.navigation[this.section].label
-        }
-      } */
-      return this.section ? this.navigation[this.section].label : ''
-    }
-  },
   methods: {
     onProgressChange (progress) {
       // progress 进度条的数值（0-100）

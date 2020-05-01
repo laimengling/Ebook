@@ -1,5 +1,6 @@
 // 书籍的静态信息保存，便于后期维护
 import { getReadTime } from './localStorage'
+import { realPx } from './utils'
 
 export const FONT_SIZE_LIST = [
   { fontSize: 12 },
@@ -27,7 +28,9 @@ export function themeList (vue) {
       style: {
         body: {
           color: '#4c5059',
-          background: '#cecece'
+          background: '#cecece',
+          'padding-top': `${realPx(40)}px!important`,
+          'padding-bottom': `${realPx(40)}px!important`
         }
       }
     },
@@ -37,7 +40,9 @@ export function themeList (vue) {
       style: {
         body: {
           color: '#404c42',
-          background: '#a9c1a9'
+          background: '#a9c1a9',
+          'padding-top': `${realPx(40)}px!important`,
+          'padding-bottom': `${realPx(40)}px!important`
         }
       }
     },
@@ -47,7 +52,9 @@ export function themeList (vue) {
       style: {
         body: {
           color: '#cecece',
-          background: '#000000'
+          background: '#000000',
+          'padding-top': `${realPx(40)}px!important`,
+          'padding-bottom': `${realPx(40)}px!important`
         }
       }
     },
@@ -57,7 +64,9 @@ export function themeList (vue) {
       style: {
         body: {
           color: '#5c5b56',
-          background: 'rgba(205,179,128,.4)'
+          background: 'rgba(205,179,128,.4)',
+          'padding-top': `${realPx(40)}px!important`,
+          'padding-bottom': `${realPx(40)}px!important`
         }
       }
     }
