@@ -1,6 +1,6 @@
 import { mapGetters, mapActions } from 'vuex'
 import { addCss, removeAllCss, themeList, getReadTimeByMinute } from './book'
-import { saveLocation } from './localStorage'
+import { getBookmark, saveLocation } from './localStorage'
 
 export const ebookMixin = {
   computed: {
@@ -65,7 +65,18 @@ export const ebookMixin = {
         this.setProgress(Math.floor(progress * 100))
         this.setSection(currentLocation.start.index)
         // 保存初始位置，存入缓存
-        saveLocation(this.fileName, currentLocation.start.cfi)
+        const startcfi = currentLocation.start.cfi
+        saveLocation(this.fileName, startcfi)
+        const bookmark = getBookmark(this.fileName)
+        if (bookmark) {
+          if (bookmark.some(item => item.cfi === startcfi)) {
+            this.setIsBookmark(true)
+          } else {
+            this.setIsBookmark(false)
+          }
+        } else {
+          this.setIsBookmark(false)
+        }
       }
     }, // 刷新位置，确保进度条与章节跳转相符
     display (target, cb) {

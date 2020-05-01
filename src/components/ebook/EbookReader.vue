@@ -1,10 +1,11 @@
 <template>
     <div class="ebook-reader">
         <div id="read"></div>
-        <div class="mask">
-            <div class="left" @click="prevPage()"></div>
-            <div class="center" @click="toggleTitleAndMenu()"></div>
-            <div class="right" @click="nextPage()"></div>
+        <div class="mask"
+             @click="onMaskClick"
+             @touchmove = "move"
+             @touchend = "moveEnd"
+        >
         </div>
     </div>
 </template>
@@ -92,7 +93,6 @@ export default {
       })
       // 判定是否已读，已读跳转章节，并刷新使得进度条等一致
       const location = getLocation(this.fileName)
-      console.log(location)
       this.display(location, () => {
         this.initFontSize()
         this.initFontFamily()
@@ -165,7 +165,33 @@ export default {
         })
         this.setNavigation(navItem)
       })
-    } // 解析电子书的基本信息，方便目录中查找下方信息的修改
+    }, // 解析电子书的基本信息，方便目录中查找下方信息的修改
+    onMaskClick (e) {
+      const offsetX = e.offsetX
+      const width = window.innerWidth
+      if (offsetX > 0 && offsetX < width * 0.3) {
+        this.prevPage()
+      } else if (offsetX > 0 && offsetX > width * 0.7) {
+        this.nextPage()
+      } else {
+        this.toggleTitleAndMenu()
+      }
+    }, // 翻页
+    move (e) {
+      let offsetY = 0
+      if (this.firstOffsetY) {
+        offsetY = e.changedTouches[0].clientY - this.firstOffsetY // 界面偏移量等于最新的触控点 - 初始的触控点
+        this.setOffsetY(offsetY)
+      } else {
+        this.firstOffsetY = e.changedTouches[0].clientY // 第一个点击的触控点
+      }
+      e.preventDefault()
+      e.stopPropagation()
+    },
+    moveEnd (e) {
+      this.setOffsetY(0)
+      this.firstOffsetY = null
+    } // 书签页的手势
   },
   mounted () {
     const fileName = this.$route.params.fileName.split('|').join('/')
@@ -191,17 +217,9 @@ export default {
             left:0;
             width: 100%;
             height: 100%;
+            background: transparent;
             z-index: 100;
             display: flex;
-            .left{
-                flex: 0 0 px2rem(100);
-            }
-            .center{
-                flex: 1;
-            }
-            .right{
-                flex: 0 0 px2rem(100);
-            }
         }
     }
 </style>
