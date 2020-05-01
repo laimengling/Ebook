@@ -5,7 +5,14 @@
              @click="onMaskClick"
              @touchmove = "move"
              @touchend = "moveEnd"
+             @mousedown.left="onMouseEnter"
+             @mousemove.left="onMouseMove"
+             @mouseup.left="onMouseEnd"
         >
+            <!--
+                手机端和PC端手势不兼容
+                鼠标与手势的区别在于鼠标移动就会触发mousemove，而手势需要手指按下移动触发touchmove
+            -->
         </div>
     </div>
 </template>
@@ -28,6 +35,48 @@ global.ePub = Epub
 export default {
   mixins: [ebookMixin],
   methods: {
+    // 1 - 鼠标进入
+    // 2 - 鼠标进入后的移动
+    // 3 - 鼠标从移动状态松手
+    // 4 - 鼠标还原
+    onMouseEnter (e) {
+      this.mouseState = 1
+      this.mouseStartTime = e.timeStamp
+      e.preventDefault()
+      e.stopPropagation()
+    },
+    onMouseMove (e) {
+      if (this.mouseState === 1) {
+        this.mouseState = 2
+      } else if (this.mouseState === 2) {
+        // 防止鼠标在未按下的时候，移动触发操作
+        let offsetY = 0
+        if (this.firstOffsetY) {
+          offsetY = e.clientY - this.firstOffsetY // 界面偏移量等于最新的触控点 - 初始的触控点
+          this.setOffsetY(offsetY)
+        } else {
+          this.firstOffsetY = e.clientY // 第一个点击的触控点
+        }
+      }
+      e.preventDefault()
+      e.stopPropagation()
+    },
+    onMouseEnd (e) {
+      if (this.mouseState === 2) {
+        this.setOffsetY(0)
+        this.firstOffsetY = null
+        this.mouseState = 3
+      } else {
+        this.mouseState = 4
+      }
+      const time = e.timeStamp - this.mouseStartTime
+      if (time < 100) {
+        // 当点击事件很短的时候，或者移动类点击的时候，就可以触发点击事件 onmouseClick
+        this.mouseState = 4
+      }
+      e.preventDefault()
+      e.stopPropagation()
+    },
     prevPage () {
       if (this.rendition) {
         this.rendition.prev().then(() => {
@@ -167,6 +216,10 @@ export default {
       })
     }, // 解析电子书的基本信息，方便目录中查找下方信息的修改
     onMaskClick (e) {
+      if (this.mouseState && (this.mouseState === 2 || this.mouseState === 3)) {
+        return
+      }
+      // 默认当鼠标点击但是什么都没有干，这时出现menu和title是可以的，其他被鼠标事件拦截
       const offsetX = e.offsetX
       const width = window.innerWidth
       if (offsetX > 0 && offsetX < width * 0.3) {
