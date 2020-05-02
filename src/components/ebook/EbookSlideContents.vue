@@ -241,7 +241,11 @@ export default {
                     line-height: px2rem(16);
                     @include ellipsis;
                 }
-                .slide-contents-item-page{}
+                .slide-contents-item-page{
+                    flex: 0 0 px2rem(30);
+                    font-size: px2rem(10);
+                    @include right;
+                }
             }
         }
         .slide-search-list{

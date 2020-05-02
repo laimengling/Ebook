@@ -78,6 +78,7 @@ export const ebookMixin = {
         // 保存初始位置，存入缓存
         const startcfi = currentLocation.start.cfi
         saveLocation(this.fileName, startcfi)
+        // 书签
         const bookmark = getBookmark(this.fileName)
         if (bookmark) {
           if (bookmark.some(item => item.cfi === startcfi)) {
@@ -118,5 +119,14 @@ export const ebookMixin = {
     getReadTimeText () {
       return this.$t('book.haveRead').replace('$1', getReadTimeByMinute(this.fileName))
     } // 获取时间
+  }
+}
+
+export const storeHomeMixin = {
+  computed: {
+    ...mapGetters(['offsetY'])
+  },
+  methods: {
+    ...mapActions(['setOffsetY'])
   }
 }
