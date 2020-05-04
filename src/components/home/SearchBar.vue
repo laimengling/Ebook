@@ -11,30 +11,43 @@
                 </div>
             </div>
             </transition>
-            <div class="title-icon-back-wrapper" :class="{'hide-title':!titleVisible}">
+            <div class="title-icon-back-wrapper"
+                 :class="{'hide-title':!titleVisible}"
+                 @click="back"
+            >
                 <span class="icon-back icon"></span>
             </div>
             <div class="search-bar-input-wrapper" :class="{'hide-title':!titleVisible}">
                 <div class="search-bar-blank" :class="{'hide-title':titleVisible}"></div>
                 <div class="search-bar-input">
                     <span class="icon-search icon"></span>
-                    <input type="text" class="input" :placeholder="$t('home.hint')" v-model="searchText">
+                    <input type="text" class="input"
+                           :placeholder="$t('home.hint')"
+                           v-model="searchText"
+                           @click = "showHotSearch"
+                    >
                 </div>
             </div>
         </div>
+        <hot-search-list v-show="hotSearchVisible" ref="hotSearch"></hot-search-list>
     </div>
 </template>
 
 <script>
 import { storeHomeMixin } from '../../util/mixin'
+import HotSearchList from './HotSearchList'
 
 export default {
   mixins: [storeHomeMixin],
+  components: {
+    HotSearchList
+  },
   data () {
     return {
       searchText: '',
       titleVisible: true,
-      shadowVisible: false
+      shadowVisible: false,
+      hotSearchVisible: false
     }
   },
   watch: {
@@ -44,6 +57,13 @@ export default {
         this.showShadow()
       } else {
         this.showTitle()
+        this.hideShadow()
+      }
+    },
+    hotSearchOffsetY (offsetY) {
+      if (offsetY > 0) {
+        this.showShadow()
+      } else {
         this.hideShadow()
       }
     }
@@ -60,6 +80,32 @@ export default {
     },
     showShadow () {
       this.shadowVisible = true
+    },
+    hideHotSearch () {
+      this.hotSearchVisible = false
+      if (this.offsetY > 0) {
+        this.showTitle()
+        this.hideTitle()
+      } else {
+        this.hideTitle()
+        this.showTitle()
+      }
+    },
+    showHotSearch () {
+      this.hideTitle()
+      this.hideShadow()
+      this.hotSearchVisible = true
+      this.$nextTick(() => { // 当这个方法结束后调用
+        this.$refs.hotSearch.reset()
+      })
+    },
+    back () {
+      if (this.offsetY > 0) {
+        this.showShadow()
+      } else {
+        this.hideShadow()
+      }
+      this.hideHotSearch()
     }
   }
 }
@@ -95,6 +141,7 @@ export default {
                 position: absolute;
                 right: px2rem(15);
                 top: 0;
+                z-index: 200;
                 height: px2rem(42);
                 @include center;
             }
@@ -103,6 +150,7 @@ export default {
             position: absolute;
             left: px2rem(15);
             top: 0;
+            z-index: 200;
             height: px2rem(42);
             @include center;
             transition: height $animationTime $animationType;

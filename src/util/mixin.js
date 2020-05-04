@@ -124,9 +124,24 @@ export const ebookMixin = {
 
 export const storeHomeMixin = {
   computed: {
-    ...mapGetters(['offsetY'])
+    ...mapGetters([
+      'offsetY',
+      'hotSearchOffsetY'
+    ])
   },
   methods: {
-    ...mapActions(['setOffsetY'])
+    ...mapActions([
+      'setOffsetY',
+      'setHotSearchOffsetY'
+    ]),
+    showBookDetail (book) {
+      this.$router.push({
+        path: '/store/detail',
+        query: {
+          fileName: book.fileName,
+          category: book.categoryText
+        }
+      })
+    }
   }
 }
