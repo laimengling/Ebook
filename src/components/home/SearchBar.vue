@@ -6,8 +6,9 @@
                 <div class="title-text-wrapper">
                     <span class="title-text title">{{$t('home.title')}}</span>
                 </div>
-                <div class="title-icon-shake-wrapper">
-                    <span class="icon-shake icon"></span>
+                <div class="title-icon-shake-wrapper" @click="switchLanguage">
+                    <span class="icon-cn icon"  v-if="lang === 'cn'"></span>
+                    <span class="icon-en icon"  v-else></span>
                 </div>
             </div>
             </transition>
@@ -25,6 +26,7 @@
                            :placeholder="$t('home.hint')"
                            v-model="searchText"
                            @click = "showHotSearch"
+                           @keyup.13.exact="search"
                     >
                 </div>
             </div>
@@ -36,6 +38,7 @@
 <script>
 import { storeHomeMixin } from '../../util/mixin'
 import HotSearchList from './HotSearchList'
+import { setLocalStorage } from '../../util/localStorage'
 
 export default {
   mixins: [storeHomeMixin],
@@ -69,6 +72,22 @@ export default {
     }
   },
   methods: {
+    switchLanguage () {
+      if (this.lang === 'cn') {
+        this.$i18n.locale = 'en'
+      } else {
+        this.$i18n.locale = 'cn'
+      }
+      setLocalStorage('locale', this.$i18n.locale)
+    },
+    search () {
+      this.$router.push({
+        path: '/store/list',
+        query: {
+          keyword: this.searchText
+        }
+      })
+    },
     hideTitle () {
       this.titleVisible = false
     },
@@ -107,6 +126,11 @@ export default {
       }
       this.hideHotSearch()
     }
+  },
+  computed: {
+    lang () {
+      return this.$i18n.locale
+    }
   }
 }
 </script>
@@ -141,7 +165,7 @@ export default {
                 position: absolute;
                 right: px2rem(15);
                 top: 0;
-                z-index: 200;
+                z-index: 220;
                 height: px2rem(42);
                 @include center;
             }

@@ -9,10 +9,9 @@
             <recommend :data="recommend" class="recommend"></recommend>
             <Featured :data="featured"
                       :title-text="$t('home.featured')"
-                      :btn-text="$t('home.seeAll')"
                       class="featured"
             ></Featured>
-            <div class="category-list-wapper" v-for="(item, index) in categoryList" :key="index">
+            <div class="category-list-wrapper" v-for="(item, index) in categoryList" :key="index">
                 <category-book class="category-book" :data="item"></category-book>
             </div>
             <category class="category" :data="categorys"></category>

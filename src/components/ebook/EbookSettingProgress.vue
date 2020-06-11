@@ -6,7 +6,7 @@
                     <span class="read-time-text">{{getReadTimeText()}}</span>
                     <span class="icon-forward"></span>
                 </div>
-                <div class="progress-wrapper" >
+                <div class="progress-wrapper">
                     <div class="progress-icon-wrapper" @click="prevSection()">
                         <span class="icon-back" ></span>
                     </div>
